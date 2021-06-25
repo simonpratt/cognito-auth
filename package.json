@@ -1,6 +1,6 @@
 {
   "name": "@dtdot/cognito-auth",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An opinionated implementation of login / auth with AWS cognito",
   "main": "build/index.js",
   "scripts": {
