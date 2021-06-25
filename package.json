@@ -1,10 +1,11 @@
 {
-  "name": "cognito-auth",
+  "name": "@dtdot/cognito-auth",
   "version": "0.0.0",
   "description": "An opinionated implementation of login / auth with AWS cognito",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
   },
   "author": "Simon Pratt <19920260+simonpratt@users.noreply.github.com>",
   "license": "ISC",
