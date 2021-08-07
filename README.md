@@ -8,7 +8,14 @@ This package has only been tested with email-based cognito auth
 
 ## Usage
 
-### Step 1: Add the CognitoAuthProvider at a high level in your app and configure with the required info
+### Step 1: Create the cognito user pool
+
+There are some constraints required when setting up the user pool
+- Choose email as the primary login method
+- De-select any/all standard required attributes
+- When generating an app client be sure to un-tick "generate client secret"
+
+### Step 2: Add the CognitoAuthProvider at a high level in your app and configure with the required info
 There are two broad categories of handling the auth flows that are supported
 
 1. Route-based login/registration where you have an individual route for each of the pages. Bind navigation calls like seen below for this method
@@ -60,7 +67,7 @@ const App = () => (
 
 ```
 
-### Step 2: Add the register and login screens to your router
+### Step 3: Add the register and login screens to your router
 ```
 const navigateToRoot = () => {
   navigate('/', true);
@@ -73,7 +80,7 @@ const routes = {
 }
 ```
 
-### Step 3: Use the _GuardedRoute_ and _UnguardedRoute_ to control auth flows within your application
+### Step 4: Use the _GuardedRoute_ and _UnguardedRoute_ to control auth flows within your application
 ```
 const navigateToLogin = () => {
   const path = window.location.pathname;
