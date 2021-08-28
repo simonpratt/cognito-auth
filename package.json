@@ -13,7 +13,7 @@
     "build"
   ],
   "dependencies": {
-    "@dtdot/lego": "^0.5.8"
+    "@dtdot/lego": "^0.12.12"
   },
   "peerDependencies": {
     "@aws-amplify/auth": "^3.4.34",
