@@ -1,14 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import React, { useEffect, useState } from 'react';
-import Auth, { CognitoUser } from '@aws-amplify/auth';
-import { Hub, HubCapsule } from '@aws-amplify/core';
 import AuthContext from '../context/Auth.context';
 
 import InternalAuthContext, { UserCredentials } from '../context/InternalAuth.context';
+import AuthService, { AuthEvent } from '../services/Auth.service';
 
 export interface CognitoAuthProviderProps {
   children: React.ReactNode;
-  region: string;
   userPoolId: string;
   userPoolWebClientId: string;
 
@@ -24,8 +22,8 @@ export interface CognitoAuthProviderProps {
 
 const safeGetAuthenticatedUser = async () => {
   try {
-    const user = await Auth.currentAuthenticatedUser();
-    return user;
+    const userId = await AuthService.getCurrentAuthenticatedUserId();
+    return userId;
   } catch {
     return undefined;
   }
@@ -33,7 +31,6 @@ const safeGetAuthenticatedUser = async () => {
 
 const CognitoAuthProvider = ({
   children,
-  region,
   userPoolId,
   userPoolWebClientId,
   handleLoginFinished,
@@ -42,26 +39,26 @@ const CognitoAuthProvider = ({
   handleRegisterAction,
   handleVerificationAction,
 }: CognitoAuthProviderProps) => {
-  const [user, setUser] = useState<CognitoUser>();
+  const [userId, setUserId] = useState<string>();
   const [verificationCredentials, setVerificationCredentials] = useState<UserCredentials>();
   const [initFinished, setInitFinished] = useState(false);
 
   useEffect(() => {
-    const authListener = async (data: HubCapsule) => {
-      switch (data.payload.event) {
+    const authListener = async (event: AuthEvent) => {
+      switch (event) {
         case 'signIn':
         case 'signUp': {
-          const _user = await safeGetAuthenticatedUser();
+          const _userId = await safeGetAuthenticatedUser();
 
-          if (!_user) {
+          if (!_userId) {
             // Probably a verification required 'sign up'
             // Return here so that we don't break the verification flow
             return;
           }
 
-          setUser(_user);
+          setUserId(_userId);
 
-          if (data.payload.event === 'signUp' || verificationCredentials?.referrer === 'register') {
+          if (event === 'signUp' || verificationCredentials?.referrer === 'register') {
             handleRegisterFinished();
           } else {
             handleLoginFinished();
@@ -69,36 +66,30 @@ const CognitoAuthProvider = ({
 
           break;
         }
-        case 'signOot': {
-          setUser(undefined);
+        case 'signOut': {
+          setUserId(undefined);
           break;
         }
         case 'configured': {
-          const _user = await safeGetAuthenticatedUser();
-          setUser(_user);
+          const _userId = await safeGetAuthenticatedUser();
+          setUserId(_userId);
           setInitFinished(true);
           break;
         }
       }
     };
 
-    Hub.listen('auth', authListener);
+    AuthService.listen(authListener);
 
-    return () => Hub.remove('auth', authListener);
+    return () => AuthService.remove(authListener);
   }, [handleLoginFinished, handleRegisterFinished, verificationCredentials]);
 
   useEffect(() => {
-    Auth.configure({
-      Auth: {
-        region,
-        userPoolId,
-        userPoolWebClientId,
-      },
-    });
-  }, [region, userPoolId, userPoolWebClientId]);
+    AuthService.configure(userPoolId, userPoolWebClientId);
+  }, [userPoolId, userPoolWebClientId]);
 
   const logout = async () => {
-    await Auth.signOut();
+    await AuthService.signOut();
   };
 
   const handleVerificationActionInternal = (data: UserCredentials) => {
@@ -107,7 +98,7 @@ const CognitoAuthProvider = ({
   };
 
   const internalValue = {
-    user,
+    userId,
     verificationCredentials,
     handleLoginAction,
     handleRegisterAction,
@@ -115,9 +106,8 @@ const CognitoAuthProvider = ({
   };
 
   const externalValue = {
-    authenticated: !!user,
-    userId: user ? user.getUsername() : undefined,
-    user,
+    authenticated: !!userId,
+    userId,
     logout,
   };
 

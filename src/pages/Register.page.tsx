@@ -41,7 +41,7 @@ const RegisterPage = () => {
         handleVerificationAction({ email, password, referrer: 'register' });
         return;
       }
-    } catch (err) {
+    } catch (err: any) {
       setLoading(false);
       setError(err.message);
     }

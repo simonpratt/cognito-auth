@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import Auth from '@aws-amplify/auth';
 import { LoginData, LoginScreen } from '@dtdot/lego';
 import InternalAuthContext from '../context/InternalAuth.context';
+import AuthService from '../services/Auth.service';
 
 const LoginContainer = styled.div`
   position: fixed;
@@ -35,10 +35,10 @@ const LoginPage = () => {
 
     try {
       setLoading(true);
-      await Auth.signIn(email, password);
-    } catch (err) {
+      await AuthService.signIn(email, password);
+    } catch (err: any) {
       if (err.code === 'UserNotConfirmedException') {
-        await Auth.resendSignUp(email);
+        await AuthService.resendSignUp(email);
         handleVerificationAction({ email, password, referrer: 'login' });
         return;
       }
