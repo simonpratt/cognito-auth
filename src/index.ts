@@ -1,5 +1,9 @@
+(window as any).global = window;
+
 export { default as AuthContext } from './context/Auth.context';
 export { default as CognitoAuthProvider } from './provider/CognitoAuth.provider';
+
+export { default as authService } from './services/Auth.service';
 
 export { default as LoginPage } from './pages/Login.page';
 export { default as RegisterPage } from './pages/Register.page';

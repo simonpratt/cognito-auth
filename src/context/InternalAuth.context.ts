@@ -1,4 +1,3 @@
-import { CognitoUser } from '@aws-amplify/auth';
 import { createContext } from 'react';
 
 export interface UserCredentials {
@@ -8,7 +7,7 @@ export interface UserCredentials {
 }
 
 export interface InternalAuthContextProps {
-  user?: CognitoUser;
+  userId?: string;
   handleLoginAction: () => void;
   handleRegisterAction: () => void;
 
@@ -17,7 +16,7 @@ export interface InternalAuthContextProps {
 }
 
 const InternalAuthContext = createContext<InternalAuthContextProps>({
-  user: undefined,
+  userId: undefined,
   // eslint-disable-next-line
   handleLoginAction: () => {},
   // eslint-disable-next-line

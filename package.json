@@ -13,7 +13,9 @@
   "files": [
     "build"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "amazon-cognito-identity-js": "^5.2.6"
+  },
   "peerDependencies": {
     "@dtdot/lego": "^0.17.9",
     "react": "^17.0.1",
@@ -21,7 +23,6 @@
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
-    "@aws-amplify/auth": "^4.4.1",
     "@dtdot/lego": "^0.17.9",
     "@types/qs": "^6.9.7",
     "@types/react": "^17.0.11",
@@ -30,7 +31,6 @@
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "@vitejs/plugin-react": "^1.2.0",
-    "amazon-cognito-identity-js": "^5.2.6",
     "eslint": "^7.29.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.4.0",
