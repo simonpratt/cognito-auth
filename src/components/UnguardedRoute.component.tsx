@@ -23,7 +23,9 @@ const UnguardedRoute = ({ component: Component, strict, onStrictRouteViolation, 
     } else if (authenticated && strict && onStrictRouteViolation) {
       setTimeout(() => setDelayWaited(true), 50);
     } else {
-      setDelayWaited(false);
+      if (setDelayWaited) {
+        setDelayWaited(false);
+      }
     }
   }, [authenticated, strict, onStrictRouteViolation, delayWaited]);
 

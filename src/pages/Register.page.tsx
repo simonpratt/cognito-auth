@@ -1,9 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { RegisterData, RegisterScreen } from '@dtdot/lego';
-import Auth from '@aws-amplify/auth';
-import InternalAuthContext from '../context/InternalAuth.context';
+import authService from '../services/Auth.service';
 
 const RegisterContainer = styled.div`
   position: fixed;
@@ -16,8 +15,6 @@ const RegisterContainer = styled.div`
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const { handleVerificationAction } = useContext(InternalAuthContext);
 
   const handleRegister = async (data: RegisterData) => {
     const email = data.email?.toLowerCase().trim();
@@ -35,12 +32,7 @@ const RegisterPage = () => {
 
     try {
       setLoading(true);
-      const result = await Auth.signUp(email, password);
-
-      if (!result.userConfirmed) {
-        handleVerificationAction({ email, password, referrer: 'register' });
-        return;
-      }
+      await authService.signUp(email, password);
     } catch (err: any) {
       setLoading(false);
       setError(err.message);

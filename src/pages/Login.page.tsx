@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { handleRegisterAction, handleVerificationAction } = useContext(InternalAuthContext);
+  const { handleRegisterAction } = useContext(InternalAuthContext);
 
   const handleLogin = async (data: LoginData) => {
     const email = data.email?.toLowerCase().trim();
@@ -37,12 +37,6 @@ const LoginPage = () => {
       setLoading(true);
       await AuthService.signIn(email, password);
     } catch (err: any) {
-      if (err.code === 'UserNotConfirmedException') {
-        await AuthService.resendSignUp(email);
-        handleVerificationAction({ email, password, referrer: 'login' });
-        return;
-      }
-
       setLoading(false);
       setError(err.message);
     }

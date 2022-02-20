@@ -11,7 +11,6 @@ export interface InternalAuthContextProps {
   user?: CognitoUser;
   handleLoginAction: () => void;
   handleRegisterAction: () => void;
-  handleVerificationAction: (details: UserCredentials) => void;
 
   /** Persist the verification info between stages */
   verificationCredentials?: UserCredentials;
@@ -23,8 +22,6 @@ const InternalAuthContext = createContext<InternalAuthContextProps>({
   handleLoginAction: () => {},
   // eslint-disable-next-line
   handleRegisterAction: () => {},
-  // eslint-disable-next-line
-  handleVerificationAction: () => {},
 
   verificationCredentials: undefined,
 });

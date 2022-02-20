@@ -1,6 +1,7 @@
 import React from 'react';
 import qs from 'qs';
 import { CognitoAuthProvider } from '../../src';
+import { useNavigate } from 'react-router-dom';
 
 const cognitoConfig = {
   userPoolId: (import.meta as any).env.VITE_AWS_COGNITO_USER_POOL_ID,
@@ -12,29 +13,29 @@ export interface AppAuthProviderProps {
 }
 
 const AppAuthProvider = ({ children }: AppAuthProviderProps) => {
+  const navigate = useNavigate();
+
   const handleLoginFinished = () => {
-    const { redirect } = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    console.log(redirect ? redirect : '/');
+    const { redirect } = qs.parse(window.location.search, { ignoreQueryPrefix: true }) as { redirect: string };
+    navigate(redirect ? redirect : '/');
   };
 
   const handleRegisterFinished = () => {
     const { redirect } = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    console.log('/get-started', false, { redirect });
+    const query = qs.stringify({ redirect }, { addQueryPrefix: true });
+    navigate(`/get-started${query}`);
   };
 
   const handleLoginAction = () => {
-    const params = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    console.log('/login', false, params);
+    navigate(`/login${window.location.search}`);
   };
 
   const handleRegisterAction = () => {
-    const params = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    console.log('/register', false, params);
+    navigate(`/register${window.location.search}`);
   };
 
   const handleVerificationAction = () => {
-    const params = qs.parse(window.location.search, { ignoreQueryPrefix: true });
-    console.log('/verify', false, params);
+    navigate(`/verify${window.location.search}`);
   };
 
   return (

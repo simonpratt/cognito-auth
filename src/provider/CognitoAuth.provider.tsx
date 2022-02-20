@@ -45,25 +45,23 @@ const CognitoAuthProvider = ({
 
   useEffect(() => {
     const authListener = async (event: AuthEvent) => {
-      switch (event) {
-        case 'signIn':
+      switch (event.type) {
+        case 'verificationRequired':
+          setVerificationCredentials(event.data);
+          handleVerificationAction();
+          break;
+        case 'signIn': {
+          const _userId = await safeGetAuthenticatedUser();
+          setUserId(_userId);
+          setVerificationCredentials(undefined);
+          handleLoginFinished();
+          break;
+        }
         case 'signUp': {
           const _userId = await safeGetAuthenticatedUser();
-
-          if (!_userId) {
-            // Probably a verification required 'sign up'
-            // Return here so that we don't break the verification flow
-            return;
-          }
-
           setUserId(_userId);
-
-          if (event === 'signUp' || verificationCredentials?.referrer === 'register') {
-            handleRegisterFinished();
-          } else {
-            handleLoginFinished();
-          }
-
+          setVerificationCredentials(undefined);
+          handleRegisterFinished();
           break;
         }
         case 'signOut': {
@@ -82,7 +80,7 @@ const CognitoAuthProvider = ({
     AuthService.listen(authListener);
 
     return () => AuthService.remove(authListener);
-  }, [handleLoginFinished, handleRegisterFinished, verificationCredentials]);
+  }, [handleLoginFinished, handleRegisterFinished, handleVerificationAction]);
 
   useEffect(() => {
     AuthService.configure(userPoolId, userPoolWebClientId);
@@ -92,17 +90,11 @@ const CognitoAuthProvider = ({
     await AuthService.signOut();
   };
 
-  const handleVerificationActionInternal = (data: UserCredentials) => {
-    setVerificationCredentials(data);
-    handleVerificationAction();
-  };
-
   const internalValue = {
     userId,
     verificationCredentials,
     handleLoginAction,
     handleRegisterAction,
-    handleVerificationAction: handleVerificationActionInternal,
   };
 
   const externalValue = {

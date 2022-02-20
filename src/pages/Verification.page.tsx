@@ -2,8 +2,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { VerificationData, VerificationScreen } from '@dtdot/lego';
-import Auth from '@aws-amplify/auth';
 import InternalAuthContext from '../context/InternalAuth.context';
+import authService from '../services/Auth.service';
 
 const VerificationContainer = styled.div`
   position: fixed;
@@ -37,9 +37,9 @@ const VerificationPage = () => {
     if (code) {
       try {
         setLoading(true);
-        await Auth.confirmSignUp(email, code);
-        await Auth.signIn(email, password);
-      } catch (err) {
+        await authService.confirmSignUp(email, code);
+        await authService.signIn(email, password);
+      } catch (err: any) {
         setError(err.message);
         setLoading(false);
       }
