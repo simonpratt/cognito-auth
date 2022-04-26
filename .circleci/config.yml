@@ -3,10 +3,12 @@ version: 2.1
 executors:
   build-agent:
     docker:
-      - image: circleci/node:10
+      - image: cimg/node:16.14.2
     working_directory: /tmp/cognito-auth
   docker-machine:
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
+    resource_class: medium
     working_directory: /tmp/cognito-auth
 
 jobs:
