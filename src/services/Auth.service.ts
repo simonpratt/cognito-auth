@@ -4,6 +4,7 @@ import {
   CognitoUser,
   CognitoUserSession,
   CognitoUserAttribute,
+  ISignUpResult,
 } from 'amazon-cognito-identity-js';
 
 export type AuthEventTypes = 'signUp' | 'signIn' | 'signOut' | 'configured' | 'verificationRequired';
@@ -11,6 +12,47 @@ export interface AuthEvent {
   type: string;
   data?: any;
 }
+
+const promisifiedCognito = {
+  authenticateUser: (cognitoUser: CognitoUser, email: string, password: string) => {
+    const authDetails = new AuthenticationDetails({ Username: email, Password: password });
+
+    return new Promise<CognitoUserSession>((resolve, reject) => {
+      cognitoUser.authenticateUser(authDetails, {
+        onSuccess: (result) => {
+          resolve(result);
+        },
+        onFailure: (error) => {
+          reject(error);
+        },
+      });
+    });
+  },
+  registerUser: (userPool: CognitoUserPool, email: string, password: string) => {
+    const attributeList = [
+      new CognitoUserAttribute({
+        Name: 'email',
+        Value: email,
+      }),
+    ];
+
+    return new Promise<ISignUpResult>((resolve, reject) => {
+      userPool.signUp(email, password, attributeList, null as any, (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (!result) {
+          reject(new Error('Unexpected error'));
+          return;
+        }
+
+        resolve(result);
+      });
+    });
+  },
+};
 
 class AuthService {
   private userPool: CognitoUserPool | undefined = undefined;
@@ -87,28 +129,20 @@ class AuthService {
     }
 
     const cognitoUser = new CognitoUser({ Username: email, Pool: this.userPool });
-    const authDetails = new AuthenticationDetails({ Username: email, Password: password });
 
-    return new Promise((resolve, reject) => {
-      cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (result) => {
-          this.cognitoUser = cognitoUser;
-          this.cognitoUserSession = result;
-          resolve(result);
-          this.emit({ type: 'signIn' });
-        },
-        onFailure: (error) => {
-          if (error.code === 'UserNotConfirmedException') {
-            this.resendSignUp(email);
-            resolve(undefined);
-            this.emit({ type: 'verificationRequired', data: { email, password } });
-            return;
-          }
-
-          reject(error);
-        },
-      });
-    });
+    try {
+      const result = await promisifiedCognito.authenticateUser(cognitoUser, email, password);
+      this.cognitoUser = cognitoUser;
+      this.cognitoUserSession = result;
+      this.emit({ type: 'signIn' });
+    } catch (error: any) {
+      if (error.code === 'UserNotConfirmedException') {
+        this.resendSignUp(email);
+        this.emit({ type: 'verificationRequired', data: { email, password } });
+      } else {
+        throw error;
+      }
+    }
   }
 
   public async signUp(email: string, password: string) {
@@ -116,35 +150,18 @@ class AuthService {
       throw new Error('App is not configured');
     }
 
-    const attributeList = [
-      new CognitoUserAttribute({
-        Name: 'email',
-        Value: email,
-      }),
-    ];
+    const result = await promisifiedCognito.registerUser(this.userPool, email, password);
 
-    return new Promise((resolve, reject) => {
-      this.userPool?.signUp(email, password, attributeList, null as any, (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+    if (result.userConfirmed === false) {
+      this.emit({ type: 'verificationRequired', data: { email, password } });
+      return;
+    }
 
-        if (!result) {
-          reject(new Error('Unkexpected error'));
-          return;
-        }
-
-        if (result.userConfirmed === false) {
-          resolve(result);
-          this.emit({ type: 'verificationRequired', data: { email, password } });
-          return;
-        }
-
-        resolve(result);
-        this.emit({ type: 'signUp' });
-      });
-    });
+    const cognitoUser = new CognitoUser({ Username: email, Pool: this.userPool });
+    const loggedInResult = await promisifiedCognito.authenticateUser(cognitoUser, email, password);
+    this.cognitoUser = cognitoUser;
+    this.cognitoUserSession = loggedInResult;
+    this.emit({ type: 'signUp' });
   }
 
   public async signOut() {
