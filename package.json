@@ -20,7 +20,7 @@
     "@dtdot/lego": "1",
     "react": "16 - 18",
     "react-dom": "16 - 18",
-    "styled-components": "5.x"
+    "styled-components": "5"
   },
   "devDependencies": {
     "@dtdot/lego": "^1.0.1",
