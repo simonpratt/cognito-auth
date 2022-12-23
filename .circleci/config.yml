@@ -3,7 +3,7 @@ version: 2.1
 executors:
   build-agent:
     docker:
-      - image: cimg/node:16.14.2
+      - image: cimg/node:18.12.1
     working_directory: /tmp/cognito-auth
   docker-machine:
     machine:
