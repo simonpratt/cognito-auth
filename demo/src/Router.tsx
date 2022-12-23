@@ -1,37 +1,51 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import qs from 'qs';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import { GuardedRoute, LoginPage, RegisterPage, UnguardedRoute, VerificationPage } from '../../src';
 import Root from '../pages/Root';
 
-const Router = () => {
+const NavigateToRoot = () => {
   const navigate = useNavigate();
 
-  const navigateToLogin = () => {
+  useEffect(() => {
+    navigate('/');
+  }, [navigate]);
+
+  return null;
+};
+
+const NavigateToLogin = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
     const path = window.location.pathname;
     const query = qs.stringify({ redirect: path }, { addQueryPrefix: true });
     navigate(`/login${query}`);
-  };
+  }, [navigate]);
 
-  const navigateToRoot = () => {
-    navigate('/');
-  };
+  return null;
+};
 
+const Router = () => {
   return (
     <Routes>
-      <Route path='/' element={<GuardedRoute component={Root} onAuthRequired={navigateToLogin} />} />
+      <Route path='/' element={<GuardedRoute component={Root} authRequiredComponent={NavigateToLogin} />} />
       <Route
         path='/login'
-        element={<UnguardedRoute component={LoginPage} strict={true} onStrictRouteViolation={navigateToRoot} />}
+        element={<UnguardedRoute component={LoginPage} strict={true} strictRouteViolationComponent={NavigateToRoot} />}
       />
       <Route
         path='/register'
-        element={<UnguardedRoute component={RegisterPage} strict={true} onStrictRouteViolation={navigateToRoot} />}
+        element={
+          <UnguardedRoute component={RegisterPage} strict={true} strictRouteViolationComponent={NavigateToRoot} />
+        }
       />
       <Route
         path='/verify'
-        element={<UnguardedRoute component={VerificationPage} strict={true} onStrictRouteViolation={navigateToRoot} />}
+        element={
+          <UnguardedRoute component={VerificationPage} strict={true} strictRouteViolationComponent={NavigateToRoot} />
+        }
       />
       <Route path='*'>Not found</Route>
     </Routes>

@@ -82,20 +82,20 @@ const routes = {
 
 ### Step 4: Use the _GuardedRoute_ and _UnguardedRoute_ to control auth flows within your application
 ```
-const navigateToLogin = () => {
+const NavigateToLoginComponent = () => {
   const path = window.location.pathname;
   navigate('/login', false, { redirect: path });
 };
 
-const navigateToRoot = () => {
+const NavigateToRootComponent = () => {
   navigate('/', true);
 };
 
 const routes = {
-  '/profile': () => <GuardedRoute component={ProfilePage} onAuthRequired={navigateToLogin} />,
-  '/login': () => <UnguardedRoute component={LoginPage} strict={true} onStrictRouteViolation={navigateToRoot} />,
-  '/register': () => <UnguardedRoute component={RegisterPage} strict={true} onStrictRouteViolation={navigateToRoot} />,
-  '/verify': () => <UnguardedRoute component={VerificationPage} strict={true} onStrictRouteViolation={navigateToRoot} />,
+  '/profile': () => <GuardedRoute component={ProfilePage} authRequiredComponent={NavigateToLoginComponent} />,
+  '/login': () => <UnguardedRoute component={LoginPage} strict={true} strictRouteViolationComponent={NavigateToRootComponent} />,
+  '/register': () => <UnguardedRoute component={RegisterPage} strict={true} strictRouteViolationComponent={NavigateToRootComponent} />,
+  '/verify': () => <UnguardedRoute component={VerificationPage} strict={true} strictRouteViolationComponent={NavigateToRootComponent} />,
 }
 ```
 
