@@ -17,13 +17,13 @@
     "amazon-cognito-identity-js": "^5.2.6"
   },
   "peerDependencies": {
-    "@dtdot/lego": "^0.19.12",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "styled-components": "^5.2.1"
+    "@dtdot/lego": "1.x",
+    "react": "16 - 18",
+    "react-dom": "16 - 18",
+    "styled-components": "5.x"
   },
   "devDependencies": {
-    "@dtdot/lego": "^0.19.12",
+    "@dtdot/lego": "^1.0.1",
     "@types/qs": "^6.9.7",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
