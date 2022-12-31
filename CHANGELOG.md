@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.0
+
+### Changes
+
+- Updated `UnguardedRoute` to only check and redirect based on auth status for initial load. This allows login and registration pages to handle their own redirect
+
 ## v2.0.0
 
 ### Breaking Changes

@@ -1,5 +1,5 @@
 import { Alert, PaddedLayout } from '@dtdot/lego';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from '../context/Auth.context';
 
 export interface UnguardedRouteProps {
@@ -20,8 +20,25 @@ const UnguardedRoute = ({
   ...props
 }: UnguardedRouteProps) => {
   const { authenticated } = useContext(AuthContext);
+  const [routeViolationBehavior, setRouteViolationBehavior] = useState<'LOADING' | 'REDIRECT' | 'RENDER'>('LOADING');
 
-  if (authenticated && strict) {
+  useEffect(() => {
+    // Check only once when the page first loads
+    // Some unguarded pages perform authentication actions and we want to allow them to control the navigation afterwards
+    if (routeViolationBehavior === 'LOADING') {
+      if (authenticated && strict) {
+        setRouteViolationBehavior('REDIRECT');
+      } else {
+        setRouteViolationBehavior('RENDER');
+      }
+    }
+  }, [authenticated, strict, routeViolationBehavior, setRouteViolationBehavior]);
+
+  if (routeViolationBehavior === 'LOADING') {
+    return null;
+  }
+
+  if (routeViolationBehavior === 'REDIRECT') {
     return StrictRouteViolationComponent ? (
       <StrictRouteViolationComponent />
     ) : (
