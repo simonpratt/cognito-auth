@@ -1,5 +1,11 @@
 # Changelog
 
+## V2.2.0
+
+### Changes
+
+- Added support for Support for @dtdot/lego v2
+
 ## v2.1.0
 
 ### Changes
