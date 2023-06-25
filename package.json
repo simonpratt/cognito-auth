@@ -17,7 +17,7 @@
     "amazon-cognito-identity-js": "^5.2.6"
   },
   "peerDependencies": {
-    "@dtdot/lego": "^1 - 2",
+    "@dtdot/lego": "^1 - 2 || ^2.0.0-0",
     "react": "16 - 18",
     "react-dom": "16 - 18",
     "styled-components": "5"
