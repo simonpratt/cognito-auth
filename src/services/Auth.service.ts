@@ -52,6 +52,23 @@ const promisifiedCognito = {
       });
     });
   },
+  refreshSession: (cognitoUser: CognitoUser, cognitoUserSession: CognitoUserSession): Promise<CognitoUserSession> => {
+    return new Promise<CognitoUserSession>((resolve, reject) => {
+      cognitoUser.refreshSession(cognitoUserSession.getRefreshToken(), (err) => {
+        if (err) {
+          reject(err);
+        }
+
+        cognitoUser.getSession((_err: any, session: CognitoUserSession) => {
+          if (_err) {
+            reject(_err);
+          }
+
+          resolve(session);
+        });
+      });
+    });
+  },
 };
 
 class AuthService {
@@ -119,8 +136,21 @@ class AuthService {
     return this.cognitoUserSession?.getAccessToken()?.payload?.username;
   }
 
-  public getCurrentUserSession(): CognitoUserSession | undefined {
+  public async getCurrentUserSession(): Promise<CognitoUserSession | undefined> {
+    if (!this.cognitoUserSession?.isValid()) {
+      await this.refreshSession();
+    }
+
     return this.cognitoUserSession;
+  }
+
+  public async refreshSession() {
+    if (!this.cognitoUser || !this.cognitoUserSession) {
+      return;
+    }
+
+    const newSession = await promisifiedCognito.refreshSession(this.cognitoUser, this.cognitoUserSession);
+    this.cognitoUserSession = newSession;
   }
 
   public async signIn(email: string, password: string) {

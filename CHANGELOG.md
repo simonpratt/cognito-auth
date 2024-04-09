@@ -1,6 +1,12 @@
 # Changelog
 
-## V2.2.0
+## v2.2.2
+
+### Changes
+
+- Added function on service to refresh the auth
+
+## 22.2.0
 
 ### Changes
 
